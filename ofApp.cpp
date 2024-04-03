@@ -28,12 +28,15 @@ void ofApp::draw() {
 	redGreenSum = averageTwo(redAmp, greenAmp);
 	redBlueSum = averageTwo(redAmp, blueAmp);
 	greenBlueSum = averageTwo(greenAmp, blueAmp);
-	redGreenDifference = abs(redAmp - greenAmp);
-	redBlueDifference = abs(redAmp - greenAmp);
-	greenBlueDifference = abs(greenAmp - blueAmp);
-	red.set(ofRandomf(), ofRandomf(), redAmp, greenBlueSum);
-	green.set(ofRandomf(), ofRandomf(), greenAmp, redBlueSum);
-	blue.set(ofRandomf(), ofRandomf(), blueAmp, redGreenSum);
+	redGreenDifference = normalizedDifference(redAmp, greenAmp);
+	redBlueDifference = normalizedDifference(redAmp, blueAmp);
+	greenBlueDifference = normalizedDifference(greenAmp, blueAmp);
+	red.set(averageTwo(redGreenSum, redBlueDifference), averageTwo(redBlueSum, redGreenDifference), redAmp, greenBlueSum);
+	green.set(averageTwo(greenBlueSum, redGreenDifference), averageTwo(redGreenSum, greenBlueDifference), greenAmp, redBlueSum);
+	blue.set(averageTwo(redBlueSum, greenBlueDifference), averageTwo(greenBlueSum, redBlueDifference), blueAmp, redGreenSum);
+	filtration.set(1.0 - triangles[0], triangles[1], triangles[3], feedback);
+	ring.set(redBlueDifference, redGreenDifference, greenBlueDifference);
+	average.set(averageTwo(redGreenDifference, redGreenSum), averageTwo(greenBlueDifference, greenBlueSum), averageTwo(redBlueDifference, redBlueSum));
 	buffer.begin();
 	shader.begin();
 	setUniforms();
@@ -69,12 +72,18 @@ float ofApp::averageTwo(float inputA, float inputB) {
 	return (inputA + inputB) / 2.0;
 }
 
+float ofApp::normalizedDifference(float inputA, float inputB) {
+	return pow(abs(inputA - inputB), 0.5);
+}
+
 void ofApp::setUniforms() {
 	shader.setUniform2f("window", window);
 	shader.setUniform4f("red", red);
 	shader.setUniform4f("green", green);
 	shader.setUniform4f("blue", blue);
-	shader.setUniform1f("feedback", feedback);
+	shader.setUniform4f("filtration", filtration);
+	shader.setUniform3f("ring", ring);
+	shader.setUniform3f("average", average);
 	shader.setUniform1f("progress", progress);
 }
 

@@ -9,6 +9,7 @@ public:
 	float triangle(float input);
 	float phasor(float input, float frequency);
 	float averageTwo(float inputA, float inputB);
+	float normalizedDifference(float inputA, float inputB);
 	void setUniforms();
 	void exit();
 	ofShader shader;
@@ -19,6 +20,9 @@ public:
 	ofVec4f red;
 	ofVec4f green;
 	ofVec4f blue;
+	ofVec4f filtration;
+	ofVec3f ring;
+	ofVec3f average;
 	float feedback;
 	float frameRate;
 	float progress = 0;
