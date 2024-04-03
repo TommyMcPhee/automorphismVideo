@@ -1,7 +1,7 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
-void ofApp::setup(){
+void ofApp::setup() {
 	shader.load("fonemaShader");
 	buffer.allocate(ofGetScreenWidth(), ofGetScreenHeight());
 	buffer.begin();
@@ -10,24 +10,30 @@ void ofApp::setup(){
 }
 
 //--------------------------------------------------------------
-void ofApp::draw(){
+void ofApp::draw() {
 	refresh();
-	mod3 = fmod(progress, 1.0 / 3.0);
-	mod4 = fmod(progress, 0.25);
-	mod5 = fmod(progress, 0.2);
-	mod7 = fmod(progress, 1.0 / 7.0);
-	tri3 = triangle(mod3);
-	tri5 = triangle(mod5);
-	tri7 = triangle(mod7);
+	for (int a = 0; a < phasors.size(); a++) {
+		phasors[a] = phasor(progress, (float)a + 1);
+		triangles[a] = triangle(phasors[a]);
+	}
 	if (progress >= 0.5) {
-		feedback = mod4;
+		feedback = phasors[3];
 	}
 	else {
-		feedback = 1.0 - mod4;
+		feedback = 1.0 - phasors[3];
 	}
-	red.set(ofRandomf(), ofRandomf(), 1.0 - tri3, tri3);
-	green.set(ofRandomf(), ofRandomf(), 1.0 - tri5, tri5);
-	blue.set(ofRandomf(), ofRandomf(), 1.0 - tri7, tri7);
+	redAmp = 1.0 - triangles[2];
+	greenAmp = 1.0 - triangles[4];
+	blueAmp = 1.0 - triangles[6];
+	redGreenSum = averageTwo(redAmp, greenAmp);
+	redBlueSum = averageTwo(redAmp, blueAmp);
+	greenBlueSum = averageTwo(greenAmp, blueAmp);
+	redGreenDifference = abs(redAmp - greenAmp);
+	redBlueDifference = abs(redAmp - greenAmp);
+	greenBlueDifference = abs(greenAmp - blueAmp);
+	red.set(ofRandomf(), ofRandomf(), redAmp, greenBlueSum);
+	green.set(ofRandomf(), ofRandomf(), greenAmp, redBlueSum);
+	blue.set(ofRandomf(), ofRandomf(), blueAmp, redGreenSum);
 	buffer.begin();
 	shader.begin();
 	setUniforms();
@@ -51,8 +57,16 @@ void ofApp::refresh() {
 	window.set(width, height);
 }
 
+float ofApp::phasor(float input, float frequency) {
+	return fmod(input, 1.0 / frequency) * frequency;
+}
+
 float ofApp::triangle(float input) {
 	return abs(input - 0.5) * 2.0;
+}
+
+float ofApp::averageTwo(float inputA, float inputB) {
+	return (inputA + inputB) / 2.0;
 }
 
 void ofApp::setUniforms() {
