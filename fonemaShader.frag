@@ -5,7 +5,6 @@ uniform sampler2DRect tex0;
 in vec2 texCoordVarying;
 out vec4 outputColor;
 uniform vec2 window;
-//uniform vec4 translate;
 uniform vec4 red;
 uniform vec4 green;
 uniform vec4 blue;
@@ -21,8 +20,17 @@ float weightedRing(float inA, float inB, float weight){
 vec2 decenter(vec2 parameters){
     return abs(parameters - 0.5) * 2.0;
 }
+
 float decenter(float parameter){
     return abs(parameter - 0.5) * 2.0;
+}
+
+float unipolar(float parameter){
+    return parameter * 0.5 + 0.5;
+}
+
+float oscillate(float phase){
+    return 1.0 - unipolar(cos(phase * TWO_PI));
 }
 
 float distributeAxis(float parameter, float normalizedComponent){
@@ -47,9 +55,9 @@ void main()
     vec2 normalized = gl_FragCoord.xy / window;
     vec2 decentered = decenter(normalized);
     vec2 centered = 1.0 - decentered;
-    float distributionA = centered.x * centered.y;
-    float distributionB = pow(1.0 - (decentered.x * decentered.y * distributionA * 2.0), 1.0 / progress);
+    float distributionA = oscillate(normalized.x * 4.0) * oscillate(normalized.y * 3.0);
+    float distributionB = pow(1.0 - (decentered.x * decentered.y * 2.0), 1.0 - progress);
     float distribution = mix(distributionA, distributionB, progress);
     vec4 newColor = vec4(distribute(red, normalized), distribute(green, normalized), distribute(blue, normalized), 1.0);
-    outputColor = mix(newColor, lastColor, filtration.w);
+    outputColor = mix(newColor, lastColor, 0.5);
 }
