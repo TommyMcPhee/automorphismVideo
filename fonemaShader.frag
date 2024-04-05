@@ -57,7 +57,7 @@ void main()
     vec2 centered = 1.0 - decentered;
     float distributionA = oscillate(normalized.x * 4.0) * oscillate(normalized.y * 3.0);
     float distributionB = pow(1.0 - (decentered.x * decentered.y * 2.0), 1.0 - progress);
-    float distribution = mix(distributionA, distributionB, progress);
+    float distribution = mix(distributionA, distributionB, 0.5);
     vec4 newColor = vec4(distribute(red, normalized), distribute(green, normalized), distribute(blue, normalized), 1.0);
     outputColor = mix(newColor, lastColor, 0.5);
 }
