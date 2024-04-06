@@ -12,7 +12,6 @@ void ofApp::setup() {
 //--------------------------------------------------------------
 void ofApp::draw() {
 	refresh();
-	cout << progress << endl;
 	for (int a = 0; a < phasors.size(); a++) {
 		phasors[a] = phasor(progress, (float)a + 1);
 		triangles[a] = triangle(phasors[a]);
@@ -48,6 +47,7 @@ void ofApp::draw() {
 }
 
 void ofApp::refresh() {
+	cout << progress << endl;
 	frameRate = ofGetFrameRate();
 	progressIncrement++;
 	progress = progressIncrement / (frameRate * length);

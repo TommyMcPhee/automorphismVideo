@@ -27,7 +27,7 @@ public:
 	float frameRate;
 	float progress = 0.0;
 	float progressIncrement = 0.0;
-	const float length = 160.0;
+	const float length = 256.0;
 	array<float, 7> phasors;
 	array<float, 7> triangles;
 	float redAmp;
